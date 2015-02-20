@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <title>Detecção de colisões</title>
+   <script src="js/animacao.js"></script>
+    <script src="js/teclado.js"></script>
+    <script src="js/nave.js"></script>
+    <script src="js/tiro.js"></script>
+    <script src="js/fundo.js"></script>
+   <style type="text/css">
+        canvas{
+            border: solid 1px black;
+        }
+   </style>
+</head>
+
+<body>
+   <canvas id="my_canvas" width="500" height="500"></canvas>
+   <script>
+        var imgEspaco = new Image();
+       imgEspaco.src = "img/fundo-espaco.png";
+       
+       var imgEstrelas = new Image();
+       imgEstrelas.src = "img/fundo-estrelas.png";
+       
+       var imgNuvens = new Image();
+       imgNuvens.src = "img/fundo-nuvens.png";
+       
+       var imgNave = new Image();
+       imgNave.src = "img/nave.png";
+       
+       var canvas = document.getElementById('my_canvas');
+       var context = canvas.getContext('2d');
+       
+       var animacao = new Animacao(context);
+       var teclado = new Teclado(document);
+       
+       var carregadas = 0;
+       var total = 4;
+       
+       var nave = new Nave(context, teclado, imgNave);
+       
+       
+       teclado.disparou(ESPACO,function(){
+            nave.atirar();    
+       });
+       
+       imgEstrelas.onload = carregando;
+       imgNuvens.onload = carregando;
+       imgEspaco.onload = carregando;
+       imgNave.onload = carregando;             
+       
+       
+       
+       function carregando(){
+           
+            carregadas++;
+           
+           if (carregadas == total){
+                iniciar();
+           }
+       }
+                  
+       function iniciar(){
+        
+           var fundoEspaco = new Fundo(context, imgEspaco);
+           var fundoEstrelas = new Fundo(context, imgEstrelas);
+           var fundoNuvens= new Fundo(context, imgNuvens);
+
+           fundoEspaco.velocidade = 3;
+           fundoEstrelas.velocidade = 7;
+           fundoNuvens.velocidade = 10;
+           
+           nave.x = canvas.width / 2 - imgNave.width / 2;
+           nave.y = canvas.height - imgNave.height;
+           nave.velocidade = 5;
+
+           
+           animacao.novoSprite(fundoEspaco);
+           animacao.novoSprite(fundoEstrelas);
+           animacao.novoSprite(fundoNuvens);
+           animacao.novoSprite(nave);
+           animacao.ligar();
+       }
+    
+       
+      
+   </script>
+</body>
+
+</html>
