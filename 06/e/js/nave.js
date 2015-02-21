@@ -58,13 +58,56 @@ Nave.prototype = {
     atirar: function(){
         var t = new Tiro(this.context, this);
         
-        if (this.direcao == PARA_ABAIXO){
-            t.velocidade = -10;
-        }
-        else{
-            t.velocidade = 10;
-        }
+        t.velocidade = -10;
+        
         this.animacao.novoSprite(t);
+        this.colisor.novoSprite(t);
+    },
+    
+    retangulosColisao: function(){
+        var rets = [
+            {
+                x: this.x+2,
+                y: this.y+19,
+                largura: 9,
+                altura: 13
+            },
+            {
+                x: this.x+13,
+                y: this.y+3,
+                largura: 10,
+                altura: 33
+            },
+            {
+                x: this.x+25,
+                y: this.y+19,
+                largura: 9,
+                altura: 13
+            },
+            
+        ];
+        
+        /*var ctx = this.context;
+        for (var i in rets){
+            ctx.save();
+            ctx.strokeStyle = 'yellow';
+            ctx.strokeRect(rets[i].x,rets[i].y,rets[i].largura,rets[i].altura);
+            ctx.restore();
+        }*/
+        return rets;
+    },
+    colidiuCom: function(outro){
+        if(outro instanceof Ovni){
+            this.animacao.excluirSprite(this);
+            this.colisor.excluirSprite(this);
+            this.animacao.excluirSprite(outro);
+            this.colisor.excluirSprite(outro);
+            
+            this.animacao.desligar();
+            
+            alert("Game Over!!");
+        
+        }
     },
 
 }

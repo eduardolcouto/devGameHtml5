@@ -23,7 +23,12 @@ function Tiro(context, nave){
 Tiro.prototype = {
     atualizar: function(){
         
-        this.y -= this.velocidade;
+        this.y += this.velocidade;
+        
+        if (this.y < - this.altura){
+            this.animacao.excluirSprite(this);
+            this.colisor.excluirSprite(this);
+        }
 
     },
     desenhar: function(){
@@ -36,4 +41,14 @@ Tiro.prototype = {
         
         ctx.restore();
     },
+    retangulosColisao: function(){
+        return [{
+            x: this.x,
+            y: this.y,
+            largura: this.largura,
+            altura: this.altura
+        }]
+    },
+    colidiuCom: function(outro){},
+
 }
