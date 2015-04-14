@@ -4,7 +4,7 @@ var PARA_DIREITA = 2;
 var PARA_ESQUERDA = 3;
 
 
-function Nave(context,teclado,imagem){
+function Nave(context,teclado,imagem, imgExplosao){
     this.context = context;
     this.teclado = teclado;
     this.imagem = imagem;
@@ -14,30 +14,38 @@ function Nave(context,teclado,imagem){
     this.direcao = 1;
     this.energia = 3;
     
+    this.spritesheet = new Spritesheet(context,imagem,3,2);
+    this.spritesheet.linha = 0;
+    this.spritesheet.intervalo = 100;
+    
     this.disparou = [];
+    
+    this.imgExplosao = imgExplosao;
 }
 
 Nave.prototype = {
     
     atualizar: function(){
         
+        var incremento = this.velocidade * this.animacao.decorrido / 1000;
+        
         if(this.teclado.pressionada(SETA_ESQUERDA) && this.x > 0){
-            this.x -= this.velocidade;
+            this.x -= incremento;
             this.direcao = PARA_ACIMA;
         }
         
-        if(this.teclado.pressionada(SETA_DIREITA) && this.x < this.context.canvas.width - this.imagem.width){
-            this.x += this.velocidade;
+        if(this.teclado.pressionada(SETA_DIREITA) && this.x < this.context.canvas.width - 36){
+            this.x += incremento;
             this.direcao = PARA_ACIMA;
         }
         
         if(this.teclado.pressionada(SETA_ACIMA) && this.y >  0){
-            this.y -= this.velocidade;
+            this.y -= incremento;
             this.direcao = PARA_ACIMA;
         }
         
-        if(this.teclado.pressionada(SETA_ABAIXO) && this.y < this.context.canvas.height - this.imagem.height){
-            this.y += this.velocidade;
+        if(this.teclado.pressionada(SETA_ABAIXO) && this.y < this.context.canvas.height - 48){
+            this.y += incremento;
             this.direcao = PARA_ABAIXO;
         }
         
@@ -49,17 +57,32 @@ Nave.prototype = {
             this.direcao = PARA_ACIMA;
         }
         
+       
         
     },
     
     desenhar: function(){
-        this.context.drawImage(this.imagem,this.x,this.y,this.imagem.width,this.imagem.height);
+        //this.context.drawImage(this.imagem,this.x,this.y,this.imagem.width,this.imagem.height);
+        if (this.teclado.pressionada(SETA_ESQUERDA)){
+            this.spritesheet.linha = 1;
+        } 
+        else if (this.teclado.pressionada(SETA_DIREITA)){
+            this.spritesheet.linha = 2;
+        }
+        else {
+            this.spritesheet.linha = 0;
+        }
+        
+        this.spritesheet.desenhar(this.x, this.y);
+        
+        this.spritesheet.proximoQuadro();
+
     },
     
     atirar: function(){
         var t = new Tiro(this.context, this);
         
-        t.velocidade = -10;
+        t.velocidade = -300 * this.animacao.decorrido / 1000;
         
         this.animacao.novoSprite(t);
         this.colisor.novoSprite(t);
@@ -107,9 +130,20 @@ Nave.prototype = {
             if(this.energia == 0){
                 this.animacao.excluirSprite(this);
                 this.colisor.excluirSprite(this);
+                this.animacao.excluirSprite(outro);
+                this.colisor.excluirSprite(outro);
                 
-                this.animacao.desligar();
-                alert("Game Over!!");
+                var exp1= new Explosao(this.context, this.imgExplosao, this.x, this.y);
+                var exp2= new Explosao(outro.context, outro.imgExplosao, outro.x, outro.y);
+                
+                this.animacao.novoSprite(exp1);
+                this.animacao.novoSprite(exp2);
+                
+                exp1.fimDaExplosao = function(){
+                   animacao.desligar(); 
+                   alert('Game Over!!!!!!!!!!!');
+                }
+
             }
             
         }

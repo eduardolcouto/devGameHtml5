@@ -21,23 +21,25 @@ Nave.prototype = {
     
     atualizar: function(){
         
+        var incremento = this.velocidade * this.animacao.decorrido / 1000;
+        
         if(this.teclado.pressionada(SETA_ESQUERDA) && this.x > 0){
-            this.x -= this.velocidade;
+            this.x -= incremento;
             this.direcao = PARA_ACIMA;
         }
         
         if(this.teclado.pressionada(SETA_DIREITA) && this.x < this.context.canvas.width - this.imagem.width){
-            this.x += this.velocidade;
+            this.x += incremento;
             this.direcao = PARA_ACIMA;
         }
         
         if(this.teclado.pressionada(SETA_ACIMA) && this.y >  0){
-            this.y -= this.velocidade;
+            this.y -= incremento;
             this.direcao = PARA_ACIMA;
         }
         
         if(this.teclado.pressionada(SETA_ABAIXO) && this.y < this.context.canvas.height - this.imagem.height){
-            this.y += this.velocidade;
+            this.y += incremento;
             this.direcao = PARA_ABAIXO;
         }
         
@@ -59,7 +61,7 @@ Nave.prototype = {
     atirar: function(){
         var t = new Tiro(this.context, this);
         
-        t.velocidade = -10;
+        t.velocidade = -300 * this.animacao.decorrido / 1000;
         
         this.animacao.novoSprite(t);
         this.colisor.novoSprite(t);

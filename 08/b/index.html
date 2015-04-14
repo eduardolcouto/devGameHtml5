@@ -11,6 +11,8 @@
     <script src="js/fundo.js"></script>
     <script src="js/colisor.js"></script>
     <script src="js/ovni.js"></script>
+    <script src="js/spritesheet.js"></script>
+    <script src="js/explosao.js"></script>
    <style type="text/css">
         canvas{
             border: solid 1px black;
@@ -35,8 +37,10 @@
                 espaco: 'fundo-espaco.png',
                 estrelas: 'fundo-estrelas.png',
                 nuvens: 'fundo-nuvens.png',
-                nave: 'nave.png',
+                nave: 'nave-spritesheet.png',
                 ovni: 'ovni.png',
+                explosao: 'explosao.png',
+                
                 
             };
             
@@ -63,7 +67,7 @@
             espaco = new Fundo(context, imagens.espaco);
             estrelas = new Fundo(context, imagens.estrelas);
             nuvens = new Fundo(context, imagens.nuvens);
-            nave = new Fundo(context, imagens.nave);
+            nave = new Nave(context,teclado, imagens.nave, imagens.explosao);
             
             animacao.novoSprite(espaco);
             animacao.novoSprite(estrelas);
@@ -78,19 +82,55 @@
         }
         
         function configuracoesIniciais(){
-            espaco.velocidade = 3;
-            estrelas.velocidade = 5;
-            nuvens.velocidade = 10;
+            espaco.velocidade = 60;
+            estrelas.velocidade = 150;
+            nuvens.velocidade = 500;
             
-            nave.x = canvas.width / 2 - imagens.nave.width / 2;
-            nave.y = canvas.height - imagens.nave.height;
-            nave.velocidade = 5;
+            nave.x = canvas.width / 2 - 18;
+            nave.y = canvas.height - 48;
+            nave.velocidade = 200;
             
             teclado.disparou(ESPACO, function(){
                 nave.atirar();
             });
             
             animacao.ligar();
+            
+            criacaoInimigos();
+        }
+        
+        function criacaoInimigos(){
+            var criador = {
+                
+                ultimoOvni: new Date().getTime(),
+                
+                processar: function(){
+                    var agora = new Date().getTime();
+                    var decorrigo = agora - this.ultimoOvni;
+                    
+                    if (decorrigo > 1000){
+                        novoOvni();
+                        this.ultimoOvni = agora;
+                    }
+                },
+                
+            };
+            
+            animacao.novoProcessamento(criador);
+        }
+        
+        function novoOvni(){
+            var imgOvni = imagens.ovni;
+            var ovni = new Ovni(context, imgOvni, imagens.explosao);
+            
+            ovni.velocidade = Math.floor((50 + Math.random()) * (400 - 50 + 1)) * animacao.decorrido / 1000; 
+            
+            ovni.x = Math.floor(Math.random() * (canvas.width - imgOvni.width + 1));
+            ovni.y = -imgOvni.height;
+            
+            animacao.novoSprite(ovni);
+            colisor.novoSprite(ovni);
+            
         }
         
         
