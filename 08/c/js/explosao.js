@@ -1,3 +1,7 @@
+var SOM_EXPLOSAO = new Audio();
+SOM_EXPLOSAO.src = 'snd/explosao.mp3';
+SOM_EXPLOSAO.volume = 0.2;
+SOM_EXPLOSAO.load();
 function Explosao(context, imagem, x, y){
     
     this.context = context;
@@ -13,6 +17,9 @@ function Explosao(context, imagem, x, y){
       if (explosao.fimDaExplosao)
           explosao.fimDaExplosao();
     }
+    
+    SOM_EXPLOSAO.currentTime = 0.0;
+    SOM_EXPLOSAO.play();
     
    
 }   

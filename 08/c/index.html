@@ -30,7 +30,11 @@
         
         var totalImagens = 0, carregadas = 0;
         
+        var musicaAcao;
+        
         carregarImagens();
+        
+        carregarMusicas();
         
         function carregarImagens(){
             imagens = {
@@ -138,9 +142,21 @@
             if (animacao.ligado){
                 animacao.desligar();
                 ativarTiro ( false );
+                
+                context.save();
+                context.fillStyle = 'white';
+                context.strokeStyle = 'black';
+                context.font = '50px sans-serif';
+                context.fillText('Pausado', 160,200);
+                context.strokeText('Pausado', 160,200);
+                context.restore();
+                
+                musicaAcao.pause();
+                
             }else{
                 animacao.ligar();
                 ativarTiro ( true );
+                musicaAcao.play();
             }
         }
         
@@ -155,6 +171,14 @@
             }
         }
         
+        function carregarMusicas(){
+            musicaAcao = new Audio();
+            musicaAcao.src = 'snd/musica-acao.mp3';
+            musicaAcao.volume = 0.1;
+            musicaAcao.load();
+            musicaAcao.loop = true;
+            musicaAcao.play();
+        }
         
     </script>
 </body>

@@ -12,7 +12,7 @@ function Nave(context,teclado,imagem, imgExplosao){
     this.y = 0;
     this.velocidade = 0;
     this.direcao = 1;
-    this.energia = 3;
+    this.energia = 1;
     
     this.spritesheet = new Spritesheet(context,imagem,3,2);
     this.spritesheet.linha = 0;
@@ -140,8 +140,14 @@ Nave.prototype = {
                 this.animacao.novoSprite(exp2);
                 
                 exp1.fimDaExplosao = function(){
-                   animacao.desligar(); 
-                   alert('Game Over!!!!!!!!!!!');
+                    animacao.desligar(); 
+                    context.save();
+                    context.fillStyle = 'red';
+                    context.strokeStyle = 'black';
+                    context.font = '50px sans-serif';
+                    context.fillText('Game Over!!!!', 100,200);
+                    context.strokeText('Game Over!!!!', 100,200);
+                    context.restore();
                 }
 
             }
