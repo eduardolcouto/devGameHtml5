@@ -13,6 +13,7 @@
     <script src="js/ovni.js"></script>
     <script src="js/spritesheet.js"></script>
     <script src="js/explosao.js"></script>
+    <script src="js/painel.js"></script>
    <style type="text/css">
         canvas{
             border: solid 1px black;
@@ -111,10 +112,12 @@
             estrelas = new Fundo(context, imagens.estrelas);
             nuvens = new Fundo(context, imagens.nuvens);
             nave = new Nave(context,teclado, imagens.nave, imagens.explosao);
+            painel = new Painel(context, nave);
             
             animacao.novoSprite(espaco);
             animacao.novoSprite(estrelas);
             animacao.novoSprite(nuvens);
+            animacao.novoSprite(painel);
             animacao.novoSprite(nave);
             
             colisor.novoSprite(nave);
@@ -128,18 +131,28 @@
             espaco.velocidade = 60;
             estrelas.velocidade = 150;
             nuvens.velocidade = 500;
-            
-            nave.x = canvas.width / 2 - 18;
-            nave.y = canvas.height - 48;
+
+            nave.posicionar();
             nave.velocidade = 200;
                
-            //animacao.ligar();
+            nave.acabaramVidas = function(){
+                
+                animacao.desligar();
+                 gameOver();
+                
+            }
+            
+            colisor.aoColidir = function(o1,o2){
+                if ((o1 instanceof Tiro && o2 instanceof Ovni) || (o2 instanceof Tiro && o1 instanceof Ovni)){
+                    painel.pontuacao += 10;
+                }
+            }
             
             criacaoInimigos();
         }
         
         function criacaoInimigos(){
-            var criador = {
+              criadorInimigos = {
                 
                 ultimoOvni: new Date().getTime(),
                 
@@ -155,7 +168,7 @@
                 
             };
             
-            animacao.novoProcessamento(criador);
+            animacao.novoProcessamento(criadorInimigos);
         }
         
         function novoOvni(){
@@ -189,6 +202,7 @@
                 musicaAcao.pause();
                 
             }else{
+                criadorInimigos.ultimoOvni = new Date().getTime();
                 animacao.ligar();
                 ativarTiro ( true );
                 musicaAcao.play();
@@ -219,12 +233,47 @@
             document.getElementById('link-jogar').style.display = 'block';
         }
         
-        function iniciarJogo(){      
+        function iniciarJogo(){   
+            criadorInimigos.ultimoOvni = new Date().getTime();
             ativarTiro ( true );
+            painel.pontuacao = 0;
             teclado.disparou(ENTER, pausarJogo);           
             document.getElementById('link-jogar').style.display = 'none';
             musicaAcao.play();
             animacao.ligar();
+        }
+        
+        function gameOver(){
+        
+            ativarTiro ( false );
+            teclado.disparou(ENTER, null);
+            musicaAcao.pause();
+            musicaAcao.currentTime = 0.0;
+            context.drawImage(imagens.espaco,0,0,canvas.width,canvas.height);
+            
+            context.save();
+            context.fillStyle = 'red';
+            context.strokeStyle = 'black';
+            context.font = '50px sans-serif';
+            context.fillText('Game Over!!!!', 100,200);
+            context.strokeText('Game Over!!!!', 100,200);
+            context.restore();
+            
+            mostrarLink();
+            
+            nave.vidasExtras = 3;
+            nave.posicionar();
+            animacao.novoSprite(nave);
+            colisor.novoSprite(nave);
+            
+            removerInimigos();
+        }
+        
+        function removerInimigos(){
+            for( var i in animacao.sprites){
+                if(animacao.sprites[i] instanceof Ovni)
+                    animacao.excluirSprite(animacao.sprites[i]);
+            }
         }
         
     </script>

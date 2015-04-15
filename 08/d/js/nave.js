@@ -12,7 +12,7 @@ function Nave(context,teclado,imagem, imgExplosao){
     this.y = 0;
     this.velocidade = 0;
     this.direcao = 1;
-    this.energia = 1;
+    
     
     this.spritesheet = new Spritesheet(context,imagem,3,2);
     this.spritesheet.linha = 0;
@@ -21,6 +21,10 @@ function Nave(context,teclado,imagem, imgExplosao){
     this.disparou = [];
     
     this.imgExplosao = imgExplosao;
+    
+    this.acabaramVidas = null;
+    this.vidasExtras = 3;
+    
 }
 
 Nave.prototype = {
@@ -124,35 +128,46 @@ Nave.prototype = {
     colidiuCom: function(outro){
         
         if(outro instanceof Ovni){
-            this.energia--;
+            this.animacao.excluirSprite(this);
+            this.colisor.excluirSprite(this);
             this.animacao.excluirSprite(outro);
             this.colisor.excluirSprite(outro);
-            if(this.energia == 0){
-                this.animacao.excluirSprite(this);
-                this.colisor.excluirSprite(this);
-                this.animacao.excluirSprite(outro);
-                this.colisor.excluirSprite(outro);
+
+            var exp1= new Explosao(this.context, this.imgExplosao, this.x, this.y);
+            var exp2= new Explosao(outro.context, outro.imgExplosao, outro.x, outro.y);
+
+            this.animacao.novoSprite(exp1);
+            this.animacao.novoSprite(exp2);
+
+
+            var nave = this;
+
+            exp1.fimDaExplosao = function(){
                 
-                var exp1= new Explosao(this.context, this.imgExplosao, this.x, this.y);
-                var exp2= new Explosao(outro.context, outro.imgExplosao, outro.x, outro.y);
-                
-                this.animacao.novoSprite(exp1);
-                this.animacao.novoSprite(exp2);
-                
-                exp1.fimDaExplosao = function(){
-                    animacao.desligar(); 
-                    context.save();
-                    context.fillStyle = 'red';
-                    context.strokeStyle = 'black';
-                    context.font = '50px sans-serif';
-                    context.fillText('Game Over!!!!', 100,200);
-                    context.strokeText('Game Over!!!!', 100,200);
-                    context.restore();
+                nave.vidasExtras--;
+                if(nave.vidasExtras < 0){
+                    if (nave.acabaramVidas){
+                        nave.acabaramVidas();
+                    }
+
+                }else{
+
+                    nave.colisor.novoSprite(nave);
+                    nave.animacao.novoSprite(nave);
+
+                    nave.posicionar();
                 }
 
             }
+
             
         }
+    },
+    
+    posicionar: function(){
+        var canvas = this.context.canvas;
+        nave.x = canvas.width / 2 - 18;
+        nave.y = canvas.height - 48;
     },
     
     
